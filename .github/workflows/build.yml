@@ -1,0 +1,20 @@
+name: Controlled CDAP admission check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: >
+      contains(github.event.pull_request.labels.*.name, 'build')
+      && (github.event.action != 'labeled' || github.event.label.name == 'build')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Read harmless controlled value
+        run: printf 'CONTROL_PROBE=%s\n' "$(cat probe-value.txt)"
